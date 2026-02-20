@@ -1,0 +1,30 @@
+{% extends 'jobs/base.html' %}
+{% block title %}Edit Profile — TalentMatch{% endblock %}
+{% block content %}
+<div style="max-width: 600px; margin: 0 auto;">
+    <div class="card">
+        <h1>
+            {% if profile.role == 'candidate' %}🧑‍💼 Candidate Profile{% else %}🏢 Recruiter Profile{% endif %}
+        </h1>
+        <p style="color: #718096; margin-bottom: 1.5rem;">
+            {% if profile.role == 'candidate' %}
+                Keep your skills and experience up to date to improve your match score.
+            {% else %}
+                Complete your company profile so candidates know who they're applying to.
+            {% endif %}
+        </p>
+        <form method="post">
+            {% csrf_token %}
+            {% for field in form %}
+            <div class="form-group">
+                <label>{{ field.label }}</label>
+                {{ field }}
+                {% if field.help_text %}<div class="helptext">{{ field.help_text }}</div>{% endif %}
+                {% if field.errors %}<ul class="errorlist">{% for e in field.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+            </div>
+            {% endfor %}
+            <button type="submit" class="btn btn-primary">Save Profile</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

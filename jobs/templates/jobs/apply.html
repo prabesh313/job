@@ -1,0 +1,54 @@
+{% extends 'jobs/base.html' %}
+{% block title %}Apply — {{ job.title }}{% endblock %}
+{% block content %}
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; max-width: 900px; margin: 0 auto;">
+    <div>
+        <div class="card" style="background: linear-gradient(135deg, #1e3a5f, #2563eb); color: white;">
+            <h2 style="color: white;">{{ job.title }}</h2>
+            <p style="color: #bfdbfe; margin: 0.3rem 0;">{{ job.recruiter.profile.company_name|default:job.recruiter.username }}</p>
+            <p style="color: #bfdbfe; font-size: 0.85rem;">📍 {{ job.location }}</p>
+        </div>
+
+        <div class="card">
+            <h2>Your Match Score</h2>
+            <div style="text-align: center; margin: 1rem 0;">
+                <div style="font-size: 3rem; font-weight: 800; color: {% if score.percentage >= 70 %}#065f46{% elif score.percentage >= 40 %}#92400e{% else %}#991b1b{% endif %};">
+                    {{ score.total }}
+                </div>
+                <div style="color: #718096;">out of {{ score.max_possible }} possible points</div>
+                <div class="score-bar-wrap" style="margin: 0.75rem auto; max-width: 200px; height: 14px;">
+                    <div class="score-bar {% if score.percentage >= 70 %}score-high{% elif score.percentage >= 40 %}score-mid{% else %}score-low{% endif %}"
+                         style="width: {{ score.percentage }}%"></div>
+                </div>
+                <strong>{{ score.percentage }}% Match</strong>
+            </div>
+
+            {% for key, item in score.breakdown.items %}
+            <div style="display: flex; justify-content: space-between; font-size: 0.85rem; padding: 0.4rem 0; border-bottom: 1px solid #f0f4f8;">
+                <span style="color: #4a5568;">{{ item.label }}</span>
+                <strong style="color: {% if item.points > 0 %}#065f46{% else %}#991b1b{% endif %}">+{{ item.points }}</strong>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="card">
+        <h1>Submit Application</h1>
+        <p style="color: #718096; margin-bottom: 1.5rem;">Your profile data will be shared with the recruiter.</p>
+        <form method="post">
+            {% csrf_token %}
+            {% for field in form %}
+            <div class="form-group">
+                <label>{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}<ul class="errorlist">{% for e in field.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+            </div>
+            {% endfor %}
+            <button type="submit" class="btn btn-success" style="width: 100%; font-size: 1rem; padding: 0.8rem;">
+                🚀 Submit Application
+            </button>
+            <a href="{% url 'job_detail' job.pk %}" style="display: block; text-align: center; margin-top: 0.5rem; color: #718096; font-size: 0.85rem;">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,61 @@
+{% extends 'jobs/base.html' %}
+{% block title %}My Applications — TalentMatch{% endblock %}
+{% block content %}
+<h1>My Applications</h1>
+<p style="color: #718096; margin-bottom: 1.5rem;">Track all your job applications in one place.</p>
+
+{% if not applications %}
+<div class="card" style="text-align: center; padding: 3rem; color: #718096;">
+    <div style="font-size: 3rem;">📋</div>
+    <h2>No applications yet</h2>
+    <p>Browse jobs and apply to get started!</p>
+    <a href="/" class="btn btn-primary" style="margin-top: 1rem;">Browse Jobs</a>
+</div>
+{% endif %}
+
+{% for app in applications %}
+<div class="card" style="border-left: 4px solid
+    {% if app.status == 'hired' %}#10b981
+    {% elif app.status == 'shortlisted' %}#2563eb
+    {% elif app.status == 'reviewed' %}#f59e0b
+    {% elif app.status == 'rejected' %}#ef4444
+    {% else %}#cbd5e0{% endif %};">
+
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 0.5rem;">
+        <div>
+            <h2><a href="{% url 'job_detail' app.job.pk %}" style="color: #1a202c; text-decoration: none;">{{ app.job.title }}</a></h2>
+            <div style="color: #718096; font-size: 0.85rem; margin-top: 0.2rem;">
+                🏢 
+                {# CHANGE: Use 'default_if_none' and 'if' to prevent RelatedObjectDoesNotExist #}
+                {% if app.job.recruiter.profile %}
+                    {{ app.job.recruiter.profile.company_name|default:app.job.recruiter.username }}
+                {% else %}
+                    {{ app.job.recruiter.username }}
+                {% endif %}
+                &nbsp;|&nbsp; 📍 {{ app.job.location }}
+                &nbsp;|&nbsp; Applied {{ app.applied_at|timesince }} ago
+            </div>
+        </div>
+        <div style="text-align: right;">
+            <div style="margin-bottom: 0.3rem;">
+                <span class="badge
+                    {% if app.status == 'hired' %}badge-green
+                    {% elif app.status == 'shortlisted' %}badge-blue
+                    {% elif app.status == 'reviewed' %}badge-yellow
+                    {% elif app.status == 'rejected' %}badge-red
+                    {% else %}badge-purple{% endif %}">
+                    {{ app.get_status_display }}
+                </span>
+            </div>
+            <div class="score-badge" style="font-size: 1.1rem; color: #2563eb;">🎯 {{ app.points_total }} pts</div>
+        </div>
+    </div>
+
+    {% if app.cover_letter %}
+    <div style="margin-top: 0.75rem; padding: 0.75rem; background: #f8fafc; border-radius: 8px; font-size: 0.88rem; color: #4a5568;">
+        {{ app.cover_letter|truncatewords:30 }}
+    </div>
+    {% endif %}
+</div>
+{% endfor %}
+{% endblock %}

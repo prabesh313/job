@@ -1,0 +1,89 @@
+{% extends 'jobs/base.html' %}
+{% block title %}TalentMatch — Find Your Next Role{% endblock %}
+
+{% block content %}
+<div style="background: linear-gradient(135deg, #1e3a5f, #2563eb); color: white; padding: 3rem 2rem; border-radius: 16px; margin-bottom: 2rem; text-align: center;">
+    <h1 style="color: white; font-size: 2.2rem;">Find Your Perfect Match</h1>
+    <p style="color: #bfdbfe; margin-bottom: 1.5rem;">Points-based matching connects the right talent with the right opportunities.</p>
+
+    <form method="get" style="display: flex; gap: 0.5rem; max-width: 700px; margin: 0 auto; flex-wrap: wrap; justify-content: center;">
+        <input type="text" name="q" value="{{ query }}" placeholder="Job title or skill (e.g. Python, Django)" style="flex: 2; min-width: 200px; border-radius: 8px; border: none; padding: 0.7rem 1rem;">
+        <input type="text" name="location" value="{{ location }}" placeholder="Location (e.g. Remote)" style="flex: 1; min-width: 140px; border-radius: 8px; border: none; padding: 0.7rem 1rem;">
+        <select name="exp" style="flex: 1; min-width: 140px; border-radius: 8px; border: none; padding: 0.7rem 1rem;">
+            <option value="">Any Level</option>
+            <option value="entry" {% if exp == 'entry' %}selected{% endif %}>Entry Level</option>
+            <option value="mid" {% if exp == 'mid' %}selected{% endif %}>Mid Level</option>
+            <option value="senior" {% if exp == 'senior' %}selected{% endif %}>Senior</option>
+            <option value="lead" {% if exp == 'lead' %}selected{% endif %}>Lead / Principal</option>
+        </select>
+        <button type="submit" class="btn btn-success">Search</button>
+    </form>
+</div>
+
+{% if user.is_authenticated and user.profile.role == 'candidate' %}
+<p style="color: #4a5568; font-size: 0.9rem; margin-bottom: 1rem;">
+    ✨ Jobs ranked by your match score. <strong>Update your <a href="{% url 'edit_profile' %}">profile</a></strong> to improve accuracy.
+</p>
+{% endif %}
+
+<div style="color: #718096; margin-bottom: 1rem; font-size: 0.9rem;">{{ scored_jobs|length }} job{{ scored_jobs|length|pluralize }} found</div>
+
+{% for item in scored_jobs %}
+{% with job=item.job score=item.score %}
+<div class="card" style="border-left: 4px solid {% if score and score.percentage >= 70 %}#10b981{% elif score and score.percentage >= 40 %}#f59e0b{% elif score %}#ef4444{% else %}#cbd5e0{% endif %};">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 0.5rem;">
+        <div>
+            <h2><a href="{% url 'job_detail' job.pk %}" style="color: #1a202c; text-decoration: none; hover: underline;">{{ job.title }}</a></h2>
+            <div style="color: #718096; font-size: 0.88rem; margin: 0.3rem 0;">
+                🏢 {{ job.recruiter.profile.company_name|default:job.recruiter.username }}
+                &nbsp;📍 {{ job.location }}
+                &nbsp;⏱ {{ job.get_required_experience_level_display }}
+                {% if job.salary_min and job.salary_max %}
+                    &nbsp;💰 ${{ job.salary_min|floatformat:0 }}k–${{ job.salary_max|floatformat:0 }}k
+                {% endif %}
+            </div>
+            <div style="margin-top: 0.4rem;">
+                {% for skill in job.get_required_skills_list %}
+                    <span class="skill-tag">{{ skill }}</span>
+                {% endfor %}
+            </div>
+        </div>
+
+        {% if score %}
+        <div style="text-align: right; min-width: 130px;">
+            <div class="score-badge" style="color: {% if score.percentage >= 70 %}#065f46{% elif score.percentage >= 40 %}#92400e{% else %}#991b1b{% endif %};">
+                🎯 {{ score.total }} pts
+            </div>
+            <div class="score-bar-wrap" style="width: 130px; margin-top: 0.4rem;">
+                <div class="score-bar {% if score.percentage >= 70 %}score-high{% elif score.percentage >= 40 %}score-mid{% else %}score-low{% endif %}"
+                     style="width: {{ score.percentage }}%"></div>
+            </div>
+            <div style="font-size: 0.75rem; color: #718096;">{{ score.percentage }}% match</div>
+            {% if item.already_applied %}
+                <span class="badge badge-green" style="margin-top: 0.4rem;">✓ Applied</span>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+
+    <p style="color: #4a5568; margin-top: 0.75rem; font-size: 0.9rem; line-height: 1.5;">
+        {{ job.description|truncatewords:30 }}
+    </p>
+
+    <div style="margin-top: 1rem; display: flex; gap: 0.5rem; align-items: center;">
+        <a href="{% url 'job_detail' job.pk %}" class="btn btn-primary btn-sm">View Details</a>
+        {% if user.is_authenticated and user.profile.role == 'candidate' and not item.already_applied %}
+            <a href="{% url 'apply_job' job.pk %}" class="btn btn-success btn-sm">Quick Apply</a>
+        {% endif %}
+        <span style="font-size: 0.8rem; color: #a0aec0; margin-left: auto;">{{ job.created_at|timesince }} ago</span>
+    </div>
+</div>
+{% endwith %}
+{% empty %}
+<div class="card" style="text-align: center; padding: 3rem; color: #718096;">
+    <div style="font-size: 3rem;">🔍</div>
+    <h2>No jobs found</h2>
+    <p>Try adjusting your search filters.</p>
+</div>
+{% endfor %}
+{% endblock %}

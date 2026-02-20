@@ -1,0 +1,65 @@
+{% extends 'jobs/base.html' %}
+{% block title %}Post a Job — TalentMatch{% endblock %}
+{% block content %}
+<div style="max-width: 680px; margin: 0 auto;">
+    <div class="card">
+        <h1>Post a New Job</h1>
+        <p style="color: #718096; margin-bottom: 1.5rem;">Be specific about skills to get better candidate matches.</p>
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label>Job Title *</label>
+                <input type="text" name="title" placeholder="e.g. Senior Django Developer" required>
+            </div>
+            <div class="form-group">
+                <label>Description *</label>
+                <textarea name="description" rows="6" placeholder="Describe the role, responsibilities, team culture..."></textarea>
+            </div>
+            <div class="form-group">
+                <label>Required Skills *</label>
+                <input type="text" name="required_skills" placeholder="Python, Django, PostgreSQL, REST API">
+                <div class="helptext">Comma-separated — candidates must have these</div>
+            </div>
+            <div class="form-group">
+                <label>Nice-to-have Skills</label>
+                <input type="text" name="nice_to_have_skills" placeholder="Docker, Kubernetes, Redis">
+                <div class="helptext">Bonus skills that earn extra points</div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Experience Level</label>
+                    <select name="required_experience_level">
+                        <option value="entry">Entry Level (0-2 yrs)</option>
+                        <option value="mid" selected>Mid Level (2-5 yrs)</option>
+                        <option value="senior">Senior (5-10 yrs)</option>
+                        <option value="lead">Lead / Principal (10+ yrs)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Min. Years Experience</label>
+                    <input type="number" name="min_years_experience" value="0" min="0" max="30">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Location</label>
+                    <input type="text" name="location" value="Remote" placeholder="Remote / New York / Hybrid">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Salary Min ($k/yr)</label>
+                    <input type="number" name="salary_min" placeholder="80">
+                </div>
+                <div class="form-group">
+                    <label>Salary Max ($k/yr)</label>
+                    <input type="number" name="salary_max" placeholder="120">
+                </div>
+            </div>
+            <button type="submit" class="btn btn-success" style="width: 100%; font-size: 1rem; padding: 0.8rem;">
+                🚀 Publish Job
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

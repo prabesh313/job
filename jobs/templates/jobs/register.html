@@ -1,0 +1,41 @@
+{% extends 'jobs/base.html' %}
+{% load socialaccount %}
+{% block title %}Register — TalentMatch{% endblock %}
+
+{% block content %}
+<div style="max-width: 520px; margin: 0 auto;">
+    <div class="card">
+        <h1 style="text-align: center; margin-bottom: 1.5rem;">Create Your Account</h1>
+
+       
+        <form method="post">
+            {% csrf_token %}
+            {% for field in form %}
+            <div class="form-group">
+                <label>{{ field.label }}</label>
+                {{ field }}
+                {% if field.help_text %}<div class="helptext">{{ field.help_text }}</div>{% endif %}
+                {% if field.errors %}
+                    <ul class="errorlist">
+                        {% for e in field.errors %}<li>{{ e }}</li>{% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+            {% endfor %}
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 0.5rem;">Create Account</button>
+        </form>
+
+     
+        <a href="{% provider_login_url 'google' process='login' %}" 
+           class="btn btn-google" 
+           style="width: 100%; background-color: #0b61eb; color: white; padding: 0.6rem; text-align: center; display: block; border-radius: 10px; margin-top: 1rem;">
+           <img src="https://img.icons8.com/color/16/google-logo.png" style="vertical-align: middle; margin-right: 8px;"> 
+           Sign up with Google
+        </a>
+
+        <p style="text-align: center; margin-top: 1rem; font-size: 0.9rem; color: #718096;">
+            Already have an account? <a href="{% url 'login' %}">Login</a>
+        </p>
+    </div>
+</div>
+{% endblock %}

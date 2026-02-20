@@ -1,0 +1,108 @@
+{% extends 'jobs/base.html' %}
+{% block title %}{{ job.title }} — TalentMatch{% endblock %}
+
+{% block content %}
+<a href="/" style="color: #2563eb; text-decoration: none; font-size: 0.9rem;">← Back to Jobs</a>
+
+<div class="card" style="margin-top: 1rem;">
+    <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+        <div>
+            <h1>{{ job.title }}</h1>
+            <div style="color: #718096; margin-top: 0.3rem; font-size: 0.9rem;">
+                🏢 <strong>{{ job.recruiter.profile.company_name|default:job.recruiter.username }}</strong>
+                &nbsp;|&nbsp; 📍 {{ job.location }}
+                &nbsp;|&nbsp; ⏱ {{ job.get_required_experience_level_display }}
+                {% if job.salary_min and job.salary_max %}
+                    &nbsp;|&nbsp; 💰 ${{ job.salary_min }}k – ${{ job.salary_max }}k
+                {% endif %}
+            </div>
+        </div>
+
+        {% if score %}
+        <div style="text-align: center; background: {% if score.percentage >= 70 %}#d1fae5{% elif score.percentage >= 40 %}#fef3c7{% else %}#fee2e2{% endif %}; padding: 1rem 1.5rem; border-radius: 12px; min-width: 150px;">
+            <div style="font-size: 2rem; font-weight: 800; color: {% if score.percentage >= 70 %}#065f46{% elif score.percentage >= 40 %}#92400e{% else %}#991b1b{% endif %};">{{ score.total }}</div>
+            <div style="font-size: 0.8rem; color: #4a5568;">Match Points</div>
+            <div class="score-bar-wrap" style="margin-top: 0.5rem;">
+                <div class="score-bar {% if score.percentage >= 70 %}score-high{% elif score.percentage >= 40 %}score-mid{% else %}score-low{% endif %}"
+                     style="width: {{ score.percentage }}%"></div>
+            </div>
+            <div style="font-size: 0.78rem; color: #718096; margin-top: 0.2rem;">{{ score.percentage }}% match</div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem; margin-top: 1rem;">
+    <div>
+        <div class="card">
+            <h2>About the Role</h2>
+            <p style="color: #4a5568; line-height: 1.7; margin-top: 0.5rem;">{{ job.description }}</p>
+        </div>
+
+        <div class="card">
+            <h2>Required Skills</h2>
+            <div style="margin-top: 0.5rem;">
+                {% for skill in job.get_required_skills_list %}
+                    <span class="skill-tag">{{ skill }}</span>
+                {% endfor %}
+            </div>
+
+            {% if job.get_nice_skills_list %}
+            <h2 style="margin-top: 1rem;">Nice to Have</h2>
+            <div style="margin-top: 0.5rem;">
+                {% for skill in job.get_nice_skills_list %}
+                    <span class="skill-tag" style="background: #f0fdf4; color: #166534;">{{ skill }}</span>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div>
+        {% if score %}
+        <div class="card">
+            <h2>Your Match Breakdown</h2>
+            {% for key, item in score.breakdown.items %}
+            <div style="margin: 0.8rem 0; padding: 0.7rem; background: #f8fafc; border-radius: 8px;">
+                <div style="display: flex; justify-content: space-between; font-size: 0.85rem;">
+                    <span style="color: #4a5568;">{{ item.label }}</span>
+                    <strong style="color: {% if item.points > 0 %}#065f46{% else %}#991b1b{% endif %}">
+                        +{{ item.points }}
+                    </strong>
+                </div>
+                {% if item.skills %}
+                <div style="margin-top: 0.3rem;">
+                    {% for skill in item.skills %}
+                        <span class="skill-tag matched">✓ {{ skill }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+
+            {% if score.missing_skills %}
+            <div style="margin-top: 1rem; padding: 0.7rem; background: #fff5f5; border-radius: 8px;">
+                <div style="font-size: 0.85rem; font-weight: 600; color: #991b1b; margin-bottom: 0.3rem;">Missing Skills</div>
+                {% for skill in score.missing_skills %}
+                    <span class="skill-tag missing">✗ {{ skill }}</span>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <div class="card" style="text-align: center;">
+            {% if user.is_authenticated and user.profile.role == 'candidate' %}
+                {% if already_applied %}
+                    <div class="badge badge-green" style="font-size: 1rem; padding: 0.5rem 1rem;">✓ Already Applied</div>
+                {% else %}
+                    <a href="{% url 'apply_job' job.pk %}" class="btn btn-success" style="width: 100%; text-align: center;">Apply Now</a>
+                {% endif %}
+            {% elif not user.is_authenticated %}
+                <a href="{% url 'login' %}" class="btn btn-primary" style="width: 100%; text-align: center;">Login to Apply</a>
+                <p style="font-size: 0.8rem; color: #718096; margin-top: 0.5rem;">Don't have an account? <a href="{% url 'register' %}">Sign up</a></p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
