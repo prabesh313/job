@@ -8,7 +8,7 @@
         <h1 style="text-align: center; margin-bottom: 1.5rem;">Welcome Back</h1>
 
         
-        <form method="post">
+        <form method="post" action="{% url 'account_login' %}">
             {% csrf_token %}
             <div class="form-group">
                 <label>Username</label>

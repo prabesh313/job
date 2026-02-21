@@ -4,15 +4,31 @@ from django.contrib.auth.forms import UserCreationForm
 from .models import UserProfile, JobPost, Application
 
 
+from django import forms
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User
+
+ROLE_CHOICES = [
+    ('candidate', 'I am looking for a job'),
+    ('recruiter', 'I want to hire talent'),
+]
+
 class RegisterForm(UserCreationForm):
-    email = forms.EmailField(required=True)
-    role = forms.ChoiceField(choices=[('candidate', 'I am looking for a job'), ('recruiter', 'I want to hire talent')])
+    email = forms.EmailField(required=True, help_text="Use a real email you own")
+    role = forms.ChoiceField(choices=ROLE_CHOICES)
     first_name = forms.CharField(max_length=50, required=True)
     last_name = forms.CharField(max_length=50, required=True)
 
     class Meta:
         model = User
         fields = ['username', 'first_name', 'last_name', 'email', 'password1', 'password2', 'role']
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if User.objects.filter(email=email).exists():
+            raise forms.ValidationError("This email is already registered. Use your own email.")
+        return email
+
 
 
 class CandidateProfileForm(forms.ModelForm):

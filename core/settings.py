@@ -57,7 +57,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'allauth.account.middleware.AccountMiddleware',
+    #'allauth.account.middleware.AccountMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -106,3 +106,21 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
+
+ACCOUNT_AUTHENTICATION_METHOD = "username"   # login uses username
+ACCOUNT_EMAIL_VERIFICATION = "mandatory"     # email must be verified
+ACCOUNT_EMAIL_REQUIRED = True                # user must provide real email
+ACCOUNT_USERNAME_REQUIRED = True             # username must be provided
+
+# settings.py
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'prabesh.csit2079@nistcollege.edu.np'         # your Gmail
+EMAIL_HOST_PASSWORD ='dikyfqecgpbauzlg'    # Gmail App Password
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+CSRF_COOKIE_SECURE = False
+SESSION_COOKIE_SECURE = False
+

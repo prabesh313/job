@@ -1,0 +1,27 @@
+{% extends 'jobs/base.html' %}
+{% block title %}Choose Role{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 500px; margin: 3rem auto; text-align: center; padding: 2rem; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-radius: 10px; background: #fff;">
+    <h2 style="margin-bottom: 1rem;">Select Your Role</h2>
+    <p style="margin-bottom: 2rem;">Please choose whether you are a Candidate or a Recruiter to continue.</p>
+
+    <form method="POST">
+        {% csrf_token %}
+        <button type="submit" name="role" value="candidate" style="padding: 12px 25px; margin: 10px; font-size: 16px; cursor: pointer; border: none; border-radius: 6px; background: #3b82f6; color: white; transition: background 0.3s;">
+            Candidate
+        </button>
+        <button type="submit" name="role" value="recruiter" style="padding: 12px 25px; margin: 10px; font-size: 16px; cursor: pointer; border: none; border-radius: 6px; background: #10b981; color: white; transition: background 0.3s;">
+            Recruiter
+        </button>
+    </form>
+
+    {% if messages %}
+        <ul style="color:red; margin-top: 20px; list-style-type:none; padding:0;">
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</div>
+{% endblock %}

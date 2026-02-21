@@ -18,7 +18,7 @@ ROLE_CHOICES = [
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
-    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='candidate')
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES, blank=True, null=True)  # 🔥 allow blank/null for Google login
     # Candidate fields
     skills = models.TextField(blank=True, help_text="Comma-separated skills (e.g. Python, Django, SQL)")
     experience_level = models.CharField(max_length=20, choices=EXPERIENCE_LEVELS, blank=True)
